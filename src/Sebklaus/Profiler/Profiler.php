@@ -95,11 +95,29 @@ class Profiler {
 			try
 			{
 				$data['sql_log'] = \DB::getQueryLog();
+				$data['sql_explain_log'] = array();
+				foreach($data['sql_log'] as $q) {
+					if($q["time"] > \Config::get('profiler::sql_explain_threshold')) {
+						$explain = \DB::select(\DB::raw("EXPLAIN ". $q["query"]), $q["bindings"]);
+						$q["explain"] = $explain;
+						$data["sql_explain_log"][] = $q;
+
+						\Log::warning("Query ". $q["query"] ." took ". $q["time"] ." seconds");
+						foreach($explain as $e) {
+							\Log::warning("EXPLAIN: ". $e->id . ", ". $e->select_type . ", ". $e->table . ", ".
+																				$e->type . ", ". $e->possible_keys . ", ". $e->key . ", ".
+																				$e->key_len . ", ". $e->ref . ", ". $e->rows . ", ".
+																				$e->Extra . "");
+						}
+					}
+				}
+
 			}
 			// Catch exception and return empty array
 			catch (\PDOException $exception)
 			{
 				$data['sql_log'] = array();
+				$data['sql_explain_log'] = array();
 			}
 			// Check if btns.storage config option is set
 			if (\Config::get('profiler::btns.storage'))
@@ -134,7 +152,7 @@ class Profiler {
 									global $app;
 									if (strpos($app::VERSION, '4.1') !== FALSE)
 									{
-										return $controller = \Route::current()->getActionName() != "" ? \Route::current()->getActionName() : "N/A"; 
+										return $controller = \Route::current()->getActionName() != "" ? \Route::current()->getActionName() : "N/A";
 									}
 									elseif (strpos($app::VERSION, '4.0') !== FALSE)
 									{
@@ -144,6 +162,7 @@ class Profiler {
 			'routes' =>			function(){ return count(\Route::getRoutes()); },
 			'log' =>			function($app_logs){ return count($app_logs); },
 			'sql' =>			function($sql_log){ return count($sql_log); },
+			'sql_explain' =>			function($sql_log_explain){ return count($sql_log_explain); },
 			'checkpoints' =>	function($times){ return round($times['total'], 3); },
 			'file' =>			function($includedFiles){ return count($includedFiles); },
 			'view' =>			function($view_data){ return count($view_data); },
@@ -154,7 +173,7 @@ class Profiler {
 			'auth-sentry' =>	function() { return \Sentry::getUser()->email ? \Sentry::getUser()->email : 'User'; },
 		);
 	}
-	
+
 	/**
 	 * return the last 24 entries of the webserver logs stored in app/storage/logs
 	 *
@@ -216,7 +235,7 @@ class Profiler {
 		// Return log entries
 		return $log;
 	}
-	
+
 
 	/**
 	 * Cleans an entire array (escapes HTML)

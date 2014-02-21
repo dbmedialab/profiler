@@ -31,6 +31,10 @@
 				@include('profiler::profiler._sql')
 			</div>
 
+			<div class="anbu-tab-pane anbu-table anbu-sql_explain">
+				@include('profiler::profiler._sql_explain')
+			</div>
+
 			<div class="anbu-tab-pane anbu-table anbu-checkpoints">
 				@include('profiler::profiler._times')
 			</div>
@@ -99,6 +103,9 @@
 						break;
 					case 'sql':
 						$count = $counts[$key]($sql_log);
+						break;
+					case 'sql_explain':
+						$count = $counts[$key]($sql_explain_log);
 						break;
 					case 'checkpoints':
 						$count= $counts[$key]($times);

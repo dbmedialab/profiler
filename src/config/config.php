@@ -4,7 +4,7 @@ return array(
 
 	// Set to TRUE to enable profiling, FALSE to disable. NULL to listen to the app.debug value (default)
 	'profiler' => NULL,
-	
+
 	// Set to TRUE to activate URL based Profiler enabling/ disabling (add /_profiler to the root url to activate the toggle mechanism, e.g. http://localhost/_profiler)
 	'urlToggle' => FALSE,
 
@@ -16,9 +16,12 @@ return array(
 
 	// Profiler can hide certain footer elements and be annoying. This makes it minimized by default. Set TRUE to enable.
 	'minimized' => FALSE,
-	
+
 	// Can use a local copy of jQuery
 	'jquery_url' => '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js',
+
+	// Timeout in milliseconds to trigger explain of slow queries
+	'sql_explain_threshold' => 500,
 
 	// Buttons: order /disable buttons
 	'btns' => array(
@@ -28,6 +31,7 @@ return array(
 		'routes'=>		array('label'=>'ROUTES'),
 		'log'=>			array('label'=>'LOG'),
 		'sql'=>			array('label'=>'SQL'),
+		'sql_explain'=>			array('label'=>'EXPLAIN'),
 		'checkpoints'=> array('label'=>'TIME'),
 		'file'=>		array('label'=>'FILES'),
 		'view'=>		array('label'=>'VIEW'),
@@ -38,5 +42,5 @@ return array(
 		'auth-sentry'=> array('label'=>'AUTH')
 	),
 	'doc' => 'http://www.laravel.com/docs/',
-	
+
 );
